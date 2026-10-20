@@ -1,26 +1,30 @@
+import base64
 import hashlib
 import secrets
 from datetime import UTC, datetime, timedelta
 
+import bcrypt
 import jwt
-from argon2 import PasswordHasher
-from argon2.exceptions import InvalidHashError, VerificationError
 
 ALGORITHM = "HS256"
 MIN_SECRET_LENGTH = 32
 
-_hasher = PasswordHasher()
-DUMMY_HASH = _hasher.hash("dummy-pass")
+
+def _prepare(password: str) -> bytes:
+    return base64.b64encode(hashlib.sha256(password.encode()).digest())
+
+
+DUMMY_HASH = bcrypt.hashpw(_prepare("dummy-pass"), bcrypt.gensalt()).decode()
 
 
 def hash_password(password: str) -> str:
-    return _hasher.hash(password)
+    return bcrypt.hashpw(_prepare(password), bcrypt.gensalt()).decode()
 
 
 def verify_password(password: str, password_hash: str) -> bool:
     try:
-        return _hasher.verify(password_hash, password)
-    except VerificationError, InvalidHashError:
+        return bcrypt.checkpw(_prepare(password), password_hash.encode())
+    except ValueError:
         return False
 
 

@@ -19,7 +19,7 @@ SECRET = "unit-test-secret-of-at-least-32-chars"
 def test_a_password_matches_only_its_own_hash():
     stored = hash_password("correct horse")
 
-    assert stored != "correct horse" and stored.startswith("$argon2")
+    assert stored != "correct horse" and stored.startswith("$2b$")
     assert verify_password("correct horse", stored)
     assert not verify_password("wrong horse", stored)
 

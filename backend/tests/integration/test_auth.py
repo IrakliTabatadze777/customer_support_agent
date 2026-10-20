@@ -105,7 +105,7 @@ async def test_a_new_customer_is_registered_and_signed_in(serve, session_factory
     assert (await client.get("/threads", headers=headers)).json() == []
     async with session_factory() as session:
         stored = await session.scalar(select(User).where(User.email == "sam@example.com"))
-    assert stored.password_hash.startswith("$argon2") and "long-enough" not in stored.password_hash
+    assert stored.password_hash.startswith("$2b$") and "long-enough" not in stored.password_hash
     assert (await login(client, "sam@example.com", "long-enough")).status_code == 200
 
 
